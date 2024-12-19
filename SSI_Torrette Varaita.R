@@ -1,6 +1,4 @@
-pacman::p_load(readr,SPEI,openxlsx,tidyverse,fitdistrplus,actuar,evd,dyplr,lubridate,gridExtra)
-
-setwd("C:\\Users\\Benedetta\\OneDrive - Politecnico di Torino\\Documenti\\SSI\\Torrette Varaita")
+pacman::p_load(readr,SPEI,openxlsx,tidyverse,fitdistrplus,actuar,evd,dplyr,lubridate,gridExtra)
 
 # Leggi i dati dal file CSV
 my_df <- read_csv("TORRETTE VARAITA.csv")
@@ -9,6 +7,9 @@ my_df$DATA <- as.Date(my_df$DATA, format="%Y-%m-%d")
 
 my_df$Anno <- format(my_df$DATA, "%Y")
 my_df$Mese <- format(my_df$DATA, "%m")
+
+as.Date(my_df$DATA, format="%Y-%m")
+aggregate()
 
 dati_portate_medie <- data.frame(Year = integer(), Month = integer(), prcp = numeric(), stringsAsFactors = FALSE)
 
@@ -280,6 +281,35 @@ print(distribuzione_ogni_mese)
 
 write.xlsx(distribuzione_ogni_mese, "SSI_VinadioDemonte.xlsx")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ###########EVENTI CON ONSET
 
 
@@ -349,6 +379,26 @@ grafico_ssi <- ggplot(distribuzione_ogni_mese, aes(x = Date, y = SSI, fill = Col
 print(grafico_ssi)
 
 file_path <- "C:/Users/Benedetta/OneDrive - Politecnico di Torino/Documenti/SSI/Grafici SSI/SDEVI.png"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Salva il grafico nel percorso specificato
 ggsave(file_path, plot = grafico_ssi, width = 10, height = 6, dpi = 300)
