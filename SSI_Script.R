@@ -258,7 +258,7 @@ pacman::p_load(readr,SPEI,tidyverse,fitdistrplus,actuar,dplyr,future.apply, futu
     
     #Test if distributions are to be rejected through K-S test with simulated p-value
     {
-      n_sims <- 1e4
+      n_sims <- 1e2
       
       #Multithread calculation
       plan(multisession, workers = 6)
@@ -306,6 +306,59 @@ pacman::p_load(readr,SPEI,tidyverse,fitdistrplus,actuar,dplyr,future.apply, futu
           }
         }
         
+      }
+    }
+    
+    #Case where a month has no available distributions
+    {
+      for(i in 1:12){
+        if(is.null(best_fit[[i]])){
+          #A month without available distribution (excluded by K-S test) is given one
+          #even if wouldn't pass the test
+          
+          #Distribution fitting
+          {
+            #Extract values of discharge for a given month of the year
+            month_disch <- discharge$Discharge[month(discharge$Date)==i]
+            
+            #Fitting
+            distr$fit_pareto[[i]] <- tryCatch({fitdist(month_disch, "pareto")},
+                                              error = function(e){return(list(aic=Inf))})
+            
+            distr$fit_ll[[i]] <- tryCatch({fitdist(month_disch, "llogis")},
+                                          error = function(e){return(list(aic=Inf))})
+            
+            distr$fit_ln[[i]] <- tryCatch({fitdist(month_disch, "lnorm")},
+                                          error = function(e){return(list(aic=Inf))})
+            
+            distr$fit_pears3[[i]] <- tryCatch({fitdist(month_disch, "gamma3",
+                                                       start=list(
+                                                         shape=mean(month_disch)^2/var(month_disch),
+                                                         scale=var(month_disch)/mean(month_disch),
+                                                         thres=0))},
+                                              error = function(e){return(list(aic=Inf))})
+            
+            distr$fit_gev[[i]] <- tryCatch({fitdist(month_disch, "gev",
+                                                    start = list(
+                                                      shape=1,
+                                                      scale=1,
+                                                      location=0))},
+                                           error = function(e){return(list(aic=Inf))})
+            
+            distr$fit_weib[[i]] <- tryCatch({fitdist(month_disch, "weibull")},
+                                            error = function(e){return(list(aic=Inf))})
+          }
+          
+          #Choice of best distribution
+          aic_best <- Inf
+          for(j in 1:length(distr)){
+            if(distr[[j]][[i]]$aic<aic_best){
+              aic_best <- distr[[j]][[i]]$aic
+              best_fit[[i]] <- distr[[j]][[i]]
+            }
+          }
+          best_fit[[j]]
+        }
       }
     }
     
