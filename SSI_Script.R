@@ -223,6 +223,7 @@ pacman::p_load(readr,SPEI,tidyverse,fitdistrplus,actuar,dplyr,future.apply, futu
       for(i in 1:12){
         #Extract values of discharge for a given month of the year
         month_disch <- discharge$Discharge[month(discharge$Date)==i]
+        month_disch <- month_disch[!is.na(month_disch)]
         
         #Fitting
         distr$fit_pareto[[i]] <- tryCatch({fitdist(month_disch, "pareto")},
@@ -258,7 +259,7 @@ pacman::p_load(readr,SPEI,tidyverse,fitdistrplus,actuar,dplyr,future.apply, futu
     
     #Test if distributions are to be rejected through K-S test with simulated p-value
     {
-      n_sims <- 1e2
+      n_sims <- 1e4
       
       #Multithread calculation
       plan(multisession, workers = 6)
@@ -320,6 +321,7 @@ pacman::p_load(readr,SPEI,tidyverse,fitdistrplus,actuar,dplyr,future.apply, futu
           {
             #Extract values of discharge for a given month of the year
             month_disch <- discharge$Discharge[month(discharge$Date)==i]
+            month_disch <- month_disch[!is.na(month_disch)]
             
             #Fitting
             distr$fit_pareto[[i]] <- tryCatch({fitdist(month_disch, "pareto")},
